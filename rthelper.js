@@ -3,7 +3,7 @@
  * Kind of like Reddit Enhancement Suite but shittier.
  *
  *
- * @author Sam Tubbax <roosterteeth@samtubbax.be>
+ * @author Sam Tubbax <roosterteeth@panoptigraph.com>
  */
 var jsRTHelper = {
     videoTimer: null,

@@ -13,7 +13,6 @@
     ],
   "web_accessible_resources": [
         "images/seen.png"
-  ]
-
-
+  ],
+   "update_url": "http://rt.panoptigraph.com/updates.xml"
 }
