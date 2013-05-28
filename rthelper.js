@@ -46,7 +46,7 @@ var jsRTHelper = {
             if(localStorage['RT_VIDEO_' + videoId] === "true")
             {
                 $(this).css('position', 'relative');
-                $(this).append('<img class="seenit" style="position:absolute;top:58px;right:11px;" src="' + checkImage + '" />');
+                $(this).append('<img class="seenit" style="position:absolute;top:18px;right:11px;" src="' + checkImage + '" />');
             }
         });
     },
