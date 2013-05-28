@@ -1,5 +1,6 @@
 {
   "manifest_version": 2,
+  "version": "0.1",
 
   "name": "RT video Helper",
   "description": "This extension helps you keep track of the videos you've seen on RoosterTeeth.com.",
