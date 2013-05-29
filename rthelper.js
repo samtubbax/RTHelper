@@ -39,19 +39,22 @@ var jsRTHelper = {
                 if(pathnameChunks[2] == '') jsRTHelper.podcasts.showSeen();
                 if(pathnameChunks[2] == 'episode.php') jsRTHelper.podcasts.track();
                 break;
+            case 'gamepodcast':
+                if(pathnameChunks[2] == '') jsRTHelper.gamepodcasts.showSeen();
+                if(pathnameChunks[2] == 'episode.php') jsRTHelper.gamepodcasts.track();
+                break;
         }
     },
 
     /**
      * The bit for tracking podcasts
      *
-     *
      */
     podcasts: {
         timer: null,
 
         track: function () {
-            clearTimeout(jsRTHelper.videos.timer);
+            clearTimeout(jsRTHelper.podcasts.timer);
 
             var podcastId = getURLParameter('id');
 
@@ -97,6 +100,81 @@ var jsRTHelper = {
 
 
             $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
+            $('.didntSee').on('click', function (e) {
+                e.preventDefault();
+                $('div.seenit').remove();
+                localStorage['RT_PODCAST_' + $(this).data('video')] = false;
+            });
+        }
+    },
+
+    /**
+     * The bit for tracking podcasts
+     *
+     */
+    gamepodcasts: {
+        timer: null,
+
+        track: function () {
+            clearTimeout(jsRTHelper.gamepodcasts.timer);
+
+            var podcastId = getURLParameter('id');
+
+            // check if I've seen this
+            if(localStorage['RT_GAMEPODCAST_' + podcastId] === "true")
+            {
+                if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
+                {
+                    $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
+                }
+                else
+                {
+                    $('.titleLine:contains("LISTEN")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
+                }
+                $('.didntSee').on('click', function (e) {
+                    e.preventDefault();
+                    $('div.seenit').remove();
+                    localStorage['RT_GAMEPODCAST_' + $(this).data('video')] = false;
+                });
+            }
+            else
+            {
+                // set up watch timer (Set for 5 minutes)
+                jsRTHelper.gamepodcasts.timer = setTimeout(jsRTHelper.gamepodcasts.watched, 300000);
+            }
+        },
+
+        showSeen: function () {
+            var checkImage = chrome.extension.getURL("images/check.png");
+            console.log('Show seen gamepodcast');
+            $('.topContentBox table[width="100%"]>tbody>tr>td>table:gt(0)').each(function () {
+                var $podcastLink = $(this).parent();
+
+                // get classname Chunks
+                var podcastId = $(this).find('a:eq(0)').attr('href').substr(15);
+
+                console.log(podcastId);
+                // check local storage
+                if(localStorage['RT_GAMEPODCAST_' + podcastId] === "true")
+                {
+                    $(this).parent().css('position', 'relative');
+                    $(this).after('<img class="seenit" style="position:absolute;top:18px;right:11px;" src="' + checkImage + '" />');
+                }
+            });
+        },
+
+        watched: function () {
+            var podcastId = getURLParameter('id');
+            localStorage['RT_GAMEPODCAST_' + podcastId] = true;
+
+            if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
+            {
+                $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
+            }
+            else
+            {
+                $('.titleLine:contains("LISTEN")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
+            }
             $('.didntSee').on('click', function (e) {
                 e.preventDefault();
                 $('div.seenit').remove();
