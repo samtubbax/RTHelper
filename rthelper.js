@@ -235,7 +235,7 @@ var jsRTHelper = {
             var videoId = $("#socialVideo").data("id");
             localStorage['RT_VIDEO_' + videoId] = true;
 
-            var $videoThumbnail = $('.videoChooseA .videoObject' + videoId);
+            var $videoThumbnail = $('.videoChooseA.videoObject' + videoId);
             $videoThumbnail.css('position', 'relative');
             $videoThumbnail.append('<img class="seenit" style="position:absolute;top:18px;right:11px;" src="' + chrome.extension.getURL("images/seen.png") + '" />');
 

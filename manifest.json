@@ -3,7 +3,7 @@
 
   "name": "RT video Helper",
   "description": "This extension helps you keep track of the videos you've seen on RoosterTeeth.com.",
-  "version": "1.2",
+  "version": "1.2.1",
 
     "content_scripts": [
         {
