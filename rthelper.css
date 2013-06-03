@@ -1,0 +1,43 @@
+#helperPreviousButton, #helperNextButton {
+    padding: 6px;
+    background-color: rgb(60, 60, 60);
+    border: 1px solid rgb(241, 241, 241);
+    color: rgb(248, 248, 248);
+    -webkit-border-radius: 4px;
+    font-weight: bold;
+}
+#helperNextButton {
+    float: right;
+}
+#helperPreviousButton {
+    float: left;
+}
+#seenitCurrent {
+    float: none;
+    margin-bottom: 5px;
+}
+.didntSee {
+    margin-bottom: 10px;
+}
+img.seenit {
+    position: absolute;
+    top: 18px;
+    right: 11px;
+}
+.videoChooseA img.seenit {
+    position: absolute;
+    top: 18px;
+    right: 11px;
+}
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+.helperNavigation {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
