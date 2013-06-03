@@ -49,7 +49,6 @@ var jsRTHelper = {
 
     /**
      * The bit for tracking podcasts
-     *
      */
     podcasts: {
         timer: null,
@@ -110,8 +109,6 @@ var jsRTHelper = {
 
                     var navigationHTML = '<div class="helperNavigation clearfix">';
 
-                    jsRTHelper.test = $podcastsRSS;
-
                     if($currentPodcast.prev().get(0).nodeName == 'item')
                     {
                         // show next button
@@ -141,7 +138,6 @@ var jsRTHelper = {
                 // get classname Chunks
                 var podcastId = $(this).find('a:eq(0)').attr('href').substr(15);
 
-                console.log(podcastId);
                 // check local storage
                 if(localStorage['RT_PODCAST_' + podcastId] === "true")
                 {
@@ -155,14 +151,7 @@ var jsRTHelper = {
             var podcastId = getURLParameter('id');
             localStorage['RT_PODCAST_' + podcastId] = true;
 
-            if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
-            {
-                $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-            }
-            else
-            {
-                $('.titleLine:contains("LISTEN")').before('<div class="seenit"><img id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-            }
+            jsRTHelper.podcasts.insertIntoCurrent('<div class="seenit"><img id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
             $('.didntSee').on('click', function (e) {
                 e.preventDefault();
                 $('div.seenit').remove();
@@ -183,28 +172,59 @@ var jsRTHelper = {
 
             var podcastId = getURLParameter('id');
 
+            jsRTHelper.gamepodcasts.showNavigation(podcastId);
+
             // check if I've seen this
             if(localStorage['RT_GAMEPODCAST_' + podcastId] === "true")
             {
-                if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
-                {
-                    $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-                }
-                else
-                {
-                    $('.titleLine:contains("LISTEN")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-                }
-                $('.didntSee').on('click', function (e) {
-                    e.preventDefault();
-                    $('div.seenit').remove();
-                    localStorage['RT_GAMEPODCAST_' + $(this).data('video')] = false;
-                });
+                jsRTHelper.gamepodcasts.watched();
             }
             else
             {
                 // set up watch timer (Set for 5 minutes)
                 jsRTHelper.gamepodcasts.timer = setTimeout(jsRTHelper.gamepodcasts.watched, 300000);
             }
+        },
+
+        showNavigation: function (podcastId) {
+            // get a list of podcasts
+
+            $.ajax({
+                url: 'http://s3.roosterteeth.com/podcasts/gaming-index.xml',
+                success: function (xml) {
+                    $podcastsRSS = $(xml);
+
+                    // they changed the name from Rooster Teeth Podcast to RT podcast at episode 133
+                    if(podcastId > 1)
+                    {
+                        var $currentPodcast = $podcastsRSS.find('item title:contains("The Patch #' + podcastId + '"):last').parents('item');
+                    }
+                    else
+                    {
+                        var $currentPodcast = $podcastsRSS.find('item title:contains("Rooster Teeth Game Hour #' + podcastId + '"):last').parents('item');
+                    }
+
+                    var navigationHTML = '<div class="helperNavigation clearfix">';
+
+                    if($currentPodcast.prev().get(0).nodeName == 'item')
+                    {
+                        // show next button
+                        var nextPodcastLink = $currentPodcast.prev().find('link').text();
+                        navigationHTML += '<a id="helperNextButton" href="' + nextPodcastLink + '">Next</a>';
+                    }
+
+                    if($currentPodcast.next().length > 0)
+                    {
+                        // show next button
+                        var prevPodcastLink = $currentPodcast.next().find('link').text();
+                        navigationHTML += '<a id="helperPreviousButton" href="' + prevPodcastLink + '">Previous</a>';
+                    }
+
+                    navigationHTML += '</div>'
+
+                    jsRTHelper.gamepodcasts.insertIntoCurrent(navigationHTML);
+                }
+            })
         },
 
         showSeen: function () {
@@ -226,18 +246,23 @@ var jsRTHelper = {
             });
         },
 
+        insertIntoCurrent: function(html)
+        {
+            if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
+            {
+                $('.titleLine:contains("WATCH THE VIDEO")').before(html);
+            }
+            else
+            {
+                $('.titleLine:contains("LISTEN")').before(html);
+            }
+        },
+
         watched: function () {
             var podcastId = getURLParameter('id');
             localStorage['RT_GAMEPODCAST_' + podcastId] = true;
 
-            if($('.titleLine:contains("WATCH THE VIDEO")').length > 0)
-            {
-                $('.titleLine:contains("WATCH THE VIDEO")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-            }
-            else
-            {
-                $('.titleLine:contains("LISTEN")').before('<div class="seenit"><img style="float:none;margin-bottom: 5px;" id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" style="margin-bottom: 10px;" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>');
-            }
+            jsRTHelper.gamepodcasts.insertIntoCurrent('<div class="seenit"><img id="seenitCurrent" src="' + chrome.extension.getURL("images/seen.png") + '" /><br /><a class="didntSee" href="#" data-video="' + podcastId + '">Ehm, No I didn\'t...</a></div>')
             $('.didntSee').on('click', function (e) {
                 e.preventDefault();
                 $('div.seenit').remove();
